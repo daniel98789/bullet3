@@ -44,8 +44,10 @@ void btBoxShape::calculateLocalInertia(btScalar mass, btVector3& inertia) const
 					 mass / (btScalar(12.0)) * (lx * lx + ly * ly));
 }
 
-void btBoxShape::decreaseRendering() const {
+/*
+ void btBoxShape::decreaseRendering() const {
 	//Stacy: See constructor, can we change the local scaling and the margin? Or what?  
 	//m_currentImplicitShapeDimensions = (boxHalfExtents * m_localScaling) - margin;
 
 }
+*/
