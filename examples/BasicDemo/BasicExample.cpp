@@ -83,7 +83,9 @@ void BasicExample::initPhysics()
 
 		/// Create Dynamic Objects
 		btTransform startTransform;
-		startTransform.setIdentity();
+		startTransform.setIdentity(); // Stacy: Can change the transform here, from identity to something else, to change the animation
+									  // We probably don't want to change the setTransform class in any way
+									  // because it preforms rotations and translations rather than object mutation
 
 		btScalar mass(1.f);
 
@@ -105,7 +107,7 @@ void BasicExample::initPhysics()
 						btScalar(2 + .2 * k),
 						btScalar(0.2 * j)));
 
-					createRigidBody(mass, startTransform, colShape);
+					createRigidBody(mass, startTransform, colShape); // Porbably wanna look at this 
 				}
 			}
 		}

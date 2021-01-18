@@ -381,6 +381,8 @@ void btDiscreteDynamicsWorld::synchronizeMotionStates()
 
 int btDiscreteDynamicsWorld::stepSimulation(btScalar timeStep, int maxSubSteps, btScalar fixedTimeStep)
 {
+	// Stacy: Maybe each timestep, get camera position, calculate difstance from camera position, 
+	// and then change the rendered object? 
 	startProfiling(timeStep);
 
 	int numSimulationSubSteps = 0;

@@ -65,6 +65,7 @@ struct CommonRigidBodyBase : public CommonExampleInterface
 		btSequentialImpulseConstraintSolver* sol = new btSequentialImpulseConstraintSolver;
 		m_solver = sol;
 
+		// Stacy - probably want to change this to include the depriacator, or something like that
 		m_dynamicsWorld = new btDiscreteDynamicsWorld(m_dispatcher, m_broadphase, m_solver, m_collisionConfiguration);
 
 		m_dynamicsWorld->setGravity(btVector3(0, -10, 0));
@@ -72,6 +73,7 @@ struct CommonRigidBodyBase : public CommonExampleInterface
 
 	virtual void stepSimulation(float deltaTime)
 	{
+		// Stacy: This function just calls the internal function, can wrap some functionality here
 		if (m_dynamicsWorld)
 		{
 			m_dynamicsWorld->stepSimulation(deltaTime);
@@ -230,6 +232,8 @@ struct CommonRigidBodyBase : public CommonExampleInterface
 
 	virtual bool mouseMoveCallback(float x, float y)
 	{
+		// Stacy: Wanna look at this function in order to get distance from "camera" I think
+
 		CommonRenderInterface* renderer = m_guiHelper->getRenderInterface();
 
 		if (!renderer)
@@ -406,6 +410,8 @@ struct CommonRigidBodyBase : public CommonExampleInterface
 
 	btRigidBody* createRigidBody(float mass, const btTransform& startTransform, btCollisionShape* shape, const btVector4& color = btVector4(1, 0, 0, 1))
 	{
+		// Stacy: We want to look at this class for sure!
+		// TODO: Register a "mutator" in the createRigidBody class? 
 		btAssert((!shape || shape->getShapeType() != INVALID_SHAPE_PROXYTYPE));
 
 		//rigidbody is dynamic if and only if mass is non zero, otherwise static

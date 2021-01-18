@@ -169,6 +169,11 @@ public:
 		m_origin.setValue(btScalar(0.0), btScalar(0.0), btScalar(0.0));
 	}
 
+	void setDeprecate() 
+	{
+		m_basis.setZero(); // Stacy: This sets the rotational basis, not what we want... 
+		m_origin.setValue(btScalar(0.0), btScalar(0.0), btScalar(0.0));
+	}
 	/**@brief Multiply this Transform by another(this = this * another) 
    * @param t The other transform */
 	btTransform& operator*=(const btTransform& t)

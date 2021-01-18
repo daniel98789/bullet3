@@ -13,6 +13,7 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
+// Stacy: We probably want to look at this class in detail
 #ifndef BT_CONVEX_INTERNAL_SHAPE_H
 #define BT_CONVEX_INTERNAL_SHAPE_H
 
