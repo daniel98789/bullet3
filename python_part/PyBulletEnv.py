@@ -1,6 +1,7 @@
 import pybullet_data
 import time
 import pybullet as p
+import os
 
 class PyBulletEnv:
     #camera = Camera()
@@ -11,7 +12,9 @@ class PyBulletEnv:
 
     def setup(self):
         p.connect(p.GUI)
+        p.setGravity(0, 0, -9.8)
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
+        #p.setAdditionalSearchPath(os.getcwd()+"data/")
         #p.resetSimulation()
         # Make the floor...
         p.loadURDF("plane100.urdf", useMaximalCoordinates=True)

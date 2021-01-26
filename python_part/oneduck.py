@@ -22,8 +22,8 @@ def makeClient():
 
 
 def makeshape():
-    shift = [0, -0.02, 0]
-    meshScale = [0.1, 0.1, 0.1]
+    shift = [1, 1, 1]
+    meshScale = [0.01, 0.01, 0.01]
     #the visual shape and collision shape can be re-used by all createMultiBody instances (instancing)
     pClient = makeClient()
     
@@ -35,9 +35,13 @@ def makeshape():
     #                                    visualFramePosition=shift,
     #                                    meshScale=meshScale)
     collisionShapeId = p.createCollisionShape(shapeType=p.GEOM_MESH,
-                                          fileName="duck_vhacd.obj",
+                                          #fileName="teddy2_VHACD_CHs.obj",
+                                          #fileName="duck_vhacd.obj",
+                                          #fileName="data/cow.obj",
+                                          fileName="data/deer.obj",
                                           collisionFramePosition=shift,
-                                          meshScale=meshScale)
+                                          meshScale=meshScale,
+                                          flags=p.GEOM_FORCE_CONCAVE_TRIMESH)
 
 
     p.createMultiBody(baseMass = 1,
@@ -54,7 +58,7 @@ def makeshape():
         time.sleep(1./240.)
 
     print("visual shape is:")
-    print(visualShapeId)
+    #print(visualShapeId)
 
 
 if __name__ == "__main__":

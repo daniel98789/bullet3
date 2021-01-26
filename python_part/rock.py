@@ -3,6 +3,7 @@ import time
 import math
 import pybullet_data
 import PyBulletEnv
+import Obj
 
 def trapezoid():
     base = 0.000624
@@ -20,7 +21,7 @@ def trapezoid():
     ]
         
     # create convex mesh from obj!
-    stoneID = p.createCollisionShape(p.GEOM_MESH, vertices=vertices
+    stoneID = p.createCollisionShape(p.GEOM_MESH, vertices=vertices, 
                                     #indices=indices
                                     )
 
@@ -29,10 +30,32 @@ def trapezoid():
                     baseCollisionShapeIndex=stoneID, 
                     basePosition=[0, 0])
 
+def cow():
+    shift = [0, -0.02, 0]
+    meshScaleParam = 2
+    meshScale = [meshScaleParam, meshScaleParam, meshScaleParam]
+    
+    #cow = Obj.Obj("/data/cow.obj")
+    cow = Obj.Obj("/data/deer.obj")
+    vertices = cow.smaller()
+    #print("COW VERTIVES : " + str(vertices))
+    cowID = p.createCollisionShape(p.GEOM_MESH, vertices=vertices,
+                                    meshScale = meshScale,
+                                    flags = p.GEOM_FORCE_CONCAVE_TRIMESH)
+    #print("Collision Shape ID: " + str(collisionShapeId))
+
+    p.createMultiBody(baseMass = 1,
+                        baseCollisionShapeIndex = cowID,
+                        basePosition=[meshScale[0] * 2,
+                                    meshScale[1] * 2, 
+                                    1]
+    )
+
 
 
 if __name__ == "__main__":
     env = PyBulletEnv.PyBulletEnv()
     env.setup()
-    trapezoid()
+    #trapezoid()
+    cow()
     env.run()
