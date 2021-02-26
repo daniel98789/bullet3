@@ -36,7 +36,7 @@ def cow():
     meshScale = [meshScaleParam, meshScaleParam, meshScaleParam]
     
     #cow = Obj.Obj("/data/cow.obj")
-    cow = Obj.Obj("/data/deer.obj")
+    cow = Obj.Obj("/data/simple.obj")
     vertices = cow.smaller()
     #print("COW VERTIVES : " + str(vertices))
     cowID = p.createCollisionShape(p.GEOM_MESH, vertices=vertices,

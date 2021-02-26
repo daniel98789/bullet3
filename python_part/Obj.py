@@ -3,6 +3,8 @@ import os
 class Obj:
     filename = ""
     v = []
+    group_faces = dict()
+    group_smoothing = dict()
 
     def __init__(self, fn):
         self.filename = os.getcwd()+fn
@@ -12,11 +14,48 @@ class Obj:
         print("FILENAME IS" + self.filename)
         with open(self.filename) as fp:
             line = fp.readline()
+            last_group = None
             while line:
-                #print(line)
                 vs = line.split()
-                if (len(vs) >=3) and (vs[0] == "v"):
+
+                # INFO: Group: Name statements are used to organize collections of
+                # elements and simplify data manipulation for operations in the model.
+                if (len(vs) >= 2) and (vs[0] == "g"):
+                    last_group = (vs[1])
+                    self.group_faces[last_group] = []
+
+                # INFO: Smoothing: Sets the smoothing group for the elements that follow it.
+                # Not sure if needed? This may be useful if two groups have a shared egde.
+                if (len(vs) == 2) and (vs[0] == "s"):
+                    smoothing = int(vs[1])
+                    self.group_smoothing[last_group] = smoothing
+
+                # INFO: Vertex: Specifies a vertex by its three coordinates plus w. 
+                if (len(vs) >= 3) and (vs[0] == "v"):
                     self.v.append([float(vs[i])/100 for i in range(1,4)])
-                    #print(vs)
+
+                # INFO: Ignore vn and vt for know. Used for texture coordinations/normals
+                # which a render engine would use but porbably not physics.
+
+                # INFO: Faces: Using v, vt, and vn to represent geometric vertices, texture vertices, and vertex normals, the statement would read:
+                # f v/vt/vn v/vt/vn v/vt/vn v/vt/vn
+                # 3 vertices per face = triangle
+                # 4 vertices per face = square
+                if (len(vs) >= 1) and (vs[0] == "f"):
+                    if (len(vs) == 4):
+                        tri = [int(vs[i][:vs[i].index("/")]) for i in range(1,4)]
+                        self.group_faces[last_group].append(tri)
+                    if (len(vs) == 5):
+                        # INFO: Split into triangles for storage.
+                        # TODO: Not sure if bullet proof. Test later.
+                        tri_upper = [int(vs[i][:vs[i].index("/")]) for i in range(1,4)]
+                        tri_lower = [int(vs[i][:vs[i].index("/")]) for i in range(2,5)]
+                        self.group_faces[last_group].append(tri_upper)
+                        self.group_faces[last_group].append(tri_lower)
                 line = fp.readline()
+
+        print("v: {}".format(self.v))
+        print("group_faces: {}".format(self.group_faces))
+        print("group_smoothing: {}".format(self.group_smoothing))
+
         return self.v
