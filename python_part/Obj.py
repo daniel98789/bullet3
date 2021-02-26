@@ -54,8 +54,8 @@ class Obj:
                         self.group_faces[last_group].append(tri_lower)
                 line = fp.readline()
 
-        print("v: {}".format(self.v))
-        print("group_faces: {}".format(self.group_faces))
-        print("group_smoothing: {}".format(self.group_smoothing))
+        #print("v: {}".format(self.v))
+        #print("group_faces: {}".format(self.group_faces))
+        #print("group_smoothing: {}".format(self.group_smoothing))
 
         return self.v

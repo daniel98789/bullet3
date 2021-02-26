@@ -4,6 +4,8 @@ import math
 import pybullet_data
 import PyBulletEnv
 import Obj
+import MeshSimplifier
+import scipy
 
 def trapezoid():
     base = 0.000624
@@ -36,7 +38,7 @@ def cow():
     meshScale = [meshScaleParam, meshScaleParam, meshScaleParam]
     
     #cow = Obj.Obj("/data/cow.obj")
-    cow = Obj.Obj("/data/simple.obj")
+    cow = Obj.Obj("/data/deer.obj")
     vertices = cow.smaller()
     #print("COW VERTIVES : " + str(vertices))
     cowID = p.createCollisionShape(p.GEOM_MESH, vertices=vertices,
@@ -51,11 +53,27 @@ def cow():
                                     1]
     )
 
+def test_simplifier():
+    # INFO: Mesh simplifier
+    simplifier = MeshSimplifier.MeshSimplifier()
 
+    # Triangle  P = (1, 1, 1), Q = (1, 2, 0), R = (-1, 2, 1)
+    triangle = [[1, 1, 1], [1, 2, 0], [-1, 2, 1]]
+
+    # Random model
+    simple = Obj.Obj("/data/simple.obj")
+
+    plane_eqn = simplifier.triangle_to_plane(triangle)
+    Kp = simplifier.calculate_quadric_Kp(plane_eqn)
+    res = simplifier.simplify(simple)
+
+    print("plane: {}".format(plane_eqn))
+    print("Kp: {}".format(Kp))
 
 if __name__ == "__main__":
     env = PyBulletEnv.PyBulletEnv()
     env.setup()
     #trapezoid()
     cow()
+    test_simplifier()
     env.run()
