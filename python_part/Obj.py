@@ -26,7 +26,7 @@ class Obj:
 
                 # INFO: Smoothing: Sets the smoothing group for the elements that follow it.
                 # Not sure if needed? This may be useful if two groups have a shared egde.
-                if (len(vs) == 2) and (vs[0] == "s"):
+                if (last_group != None) and (len(vs) == 2) and (vs[0] == "s"):
                     smoothing = int(vs[1])
                     self.group_smoothing[last_group] = smoothing
 
@@ -42,9 +42,16 @@ class Obj:
                 # 3 vertices per face = triangle
                 # 4 vertices per face = square
                 if (len(vs) >= 1) and (vs[0] == "f"):
+                    # INFO: If there is no g group specified assume a default group.
+                    if last_group == None:
+                        last_group = 'default'
+
+                    # INFO: Parse and store triangle.
                     if (len(vs) == 4):
                         tri = [int(vs[i][:vs[i].index("/")]) for i in range(1,4)]
                         self.group_faces[last_group].append(tri)
+
+                    # INFO: Parse square, split into triangles and store triangles.
                     if (len(vs) == 5):
                         # INFO: Split into triangles for storage.
                         # TODO: Not sure if bullet proof. Test later.
@@ -52,6 +59,7 @@ class Obj:
                         tri_lower = [int(vs[i][:vs[i].index("/")]) for i in range(2,5)]
                         self.group_faces[last_group].append(tri_upper)
                         self.group_faces[last_group].append(tri_lower)
+
                 line = fp.readline()
 
         return self.v

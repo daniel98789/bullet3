@@ -13,24 +13,30 @@ class MeshSimplifier:
     # of which all vertices in the set are connected by an edge to the key vertex.
     e = None
 
-    def __init__(self, v, f):
+    def __init__(self, v: list, f: list):
         self.v = v
         self.f = f
-        self.build_valid_edges_list()
+        self.build_edges_list()
         return
 
-    def build_valid_edges_list(self):
+    # INFO: Each face only contains three edges so build an ADT representing
+    # all possible edges.
+    def build_edges_list(self):
         if self.e is None:
             self.e = dict()
 
-        # INFO: Each face only contains three edges so build an ADT representing
-        # all possible valid edges.
         for face in self.f:
             # INFO: Add edge 0 to 1
             if face[0] in self.e:
                 self.e[face[0]].add(face[1])
             else:
                 self.e[face[0]] = {face[1]}
+
+            # INFO: Add edge 1 to 0. Symmetrical to above.
+            if face[1] in self.e:
+                self.e[face[1]].add(face[0])
+            else:
+                self.e[face[1]] = {face[0]}
             
             # INFO: Add edge 0 to 2
             if face[0] in self.e:
@@ -38,21 +44,48 @@ class MeshSimplifier:
             else:
                 self.e[face[0]] = {face[2]}
 
+            # INFO: Add edge 2 to 0. Symmetrical to above.
+            if face[2] in self.e:
+                self.e[face[2]].add(face[0])
+            else:
+                self.e[face[2]] = {face[0]}
+
             # INFO: Add edge 1 to 2
             if face[1] in self.e:
                 self.e[face[1]].add(face[2])
             else:
                 self.e[face[1]] = {face[2]}
 
+            # INFO: Add edge 2 to 1.  Symmetrical to above.
+            if face[2] in self.e:
+                self.e[face[2]].add(face[1])
+            else:
+                self.e[face[2]] = {face[1]}
+
         return
 
+    # INFO: Each face only contains three edges so build an ADT representing
+    # all possible valid edges. Valid meaning the vertices share anb edge and that
+    # the norm of difference of the vertices is less then the threshold request.
+    def build_valid_edges_list(self, threshold=0.0) -> list:
+        valid_e = dict()
+        for v1_idx in self.e:
+            for v2_idx in self.e[v1_idx]:
+                v1 = (v1_idx, np.array(self.v[v1_idx]))
+                v2 = (v2_idx, np.array(self.v[v2_idx]))
+                if self.is_valid_pair(v1, v2, threshold):
+                    if v1_idx in valid_e:
+                        valid_e[v1_idx].add(v2_idx)
+                    else:
+                        valid_e[v1_idx] = {v2_idx}
+        return valid_e
+
     def is_valid_edge(self, vertex_a: (int, np.array), vertex_b: (int, np.array)) -> bool:
-        # TODO(nicholas): Implement.
-        # INFO: And edge is valid if va and vb are part of the same face.
-        return True
+        # INFO: Check if vertex a has an edge to vertex b and vice versa.
+        return (vertex_b[0] in self.e[vertex_a[0]]) and (vertex_a[0] in self.e[vertex_b[0]])
 
     def is_valid_pair(self, vertex_a: (int, np.array), vertex_b: (int, np.array), threshold=0.0) -> bool:
-        v_norm = np.norm(vertex_a[1] - vertex_b[1])
+        v_norm = np.linalg.norm(vertex_a[1] - vertex_b[1])
         return self.is_valid_edge(vertex_a, vertex_b) and (v_norm < threshold)
 
     def triangle_to_plane(self, tri_v) -> np.array:
@@ -88,6 +121,7 @@ class MeshSimplifier:
         c = plane_eqn[2]
         d = plane_eqn[3]
 
+        # TODO: Rewrite this to equal (p^T)(p) where p is the plane eqn vector.
         R1 = [a*a, a*b, a*c, a*d]
         R2 = [a*b, b*b, b*c, b*d]
         R3 = [a*c, b*c, c*c, c*d]
@@ -98,9 +132,35 @@ class MeshSimplifier:
 
     def simplify(self, threshold=0.0):
         # TODO: Implement.
+        # TODO: Check for correctness.
 
-        # TODO: 1. Compute Q for all faces.
+        # INFO: 1. Compute Q for all faces.
+        # INFO: face_plane_eqns: Key = Vertex, Value = Set of all plane eqns for that vertex.
+        face_plane_eqns = dict()
+        for face in self.f:
+            vP = self.v[face[0]]
+            vQ = self.v[face[1]]
+            vR = self.v[face[2]]
+
+            plane_eqn = self.triangle_to_plane([vP, vQ, vR])
+            for i in range(0, 3):
+                if face[i] in face_plane_eqns:
+                    face_plane_eqns[face[i]].append(plane_eqn)
+                else:
+                    face_plane_eqns[face[i]] = [plane_eqn]
+
+        # INFO: q_matrices: Key = Vertex, Value = Sum of all q matrices for that vertex.
+        q_matrices = dict()
+        for vertex in self.e:
+            Q = np.identity(4)
+            for plane_eqn in face_plane_eqns[vertex]:
+                Q = Q + self.calculate_quadric_Kp(plane_eqn)
+            q_matrices[vertex] = Q
+
+
         # TODO: 2. Select all valid edges.
+        valid_e = self.build_valid_edges_list(threshold)
+
         # TODO: 3. Compute optimal vertex contraction for each vertex pair
         # TODO: 4.
         # TODO: 5.

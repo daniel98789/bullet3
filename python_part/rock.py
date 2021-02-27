@@ -67,7 +67,7 @@ def test_simplifier():
 
     plane_eqn = simplifier.triangle_to_plane(triangle)
     Kp = simplifier.calculate_quadric_Kp(plane_eqn)
-    res = simplifier.simplify(simple)
+    res = simplifier.simplify(1.0)
 
     print("plane: {}".format(plane_eqn))
     print("Kp: {}".format(Kp))
