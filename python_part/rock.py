@@ -55,13 +55,15 @@ def cow():
 
 def test_simplifier():
     # INFO: Mesh simplifier
-    simplifier = MeshSimplifier.MeshSimplifier()
 
     # Triangle  P = (1, 1, 1), Q = (1, 2, 0), R = (-1, 2, 1)
     triangle = [[1, 1, 1], [1, 2, 0], [-1, 2, 1]]
 
     # Random model
     simple = Obj.Obj("/data/simple.obj")
+    simple.smaller()
+
+    simplifier = MeshSimplifier.MeshSimplifier(simple.v, simple.group_faces['box'])
 
     plane_eqn = simplifier.triangle_to_plane(triangle)
     Kp = simplifier.calculate_quadric_Kp(plane_eqn)

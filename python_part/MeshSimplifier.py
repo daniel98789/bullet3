@@ -5,17 +5,53 @@ import sys
 import Obj
 
 class MeshSimplifier:
-    a = []
+    v = []
+    f = []
 
-    def __init__(self):
+    # Contains list of valid edges.
+    # The key represents the first vertex and the value contains a set
+    # of which all vertices in the set are connected by an edge to the key vertex.
+    e = None
+
+    def __init__(self, v, f):
+        self.v = v
+        self.f = f
+        self.build_valid_edges_list()
         return
 
-    def is_valid_edge(self, model: Obj, vertex_a: (int, np.array), vertex_b: (int, np.array)) -> bool:
+    def build_valid_edges_list(self):
+        if self.e is None:
+            self.e = dict()
+
+        # INFO: Each face only contains three edges so build an ADT representing
+        # all possible valid edges.
+        for face in self.f:
+            # INFO: Add edge 0 to 1
+            if face[0] in self.e:
+                self.e[face[0]].add(face[1])
+            else:
+                self.e[face[0]] = {face[1]}
+            
+            # INFO: Add edge 0 to 2
+            if face[0] in self.e:
+                self.e[face[0]].add(face[2])
+            else:
+                self.e[face[0]] = {face[2]}
+
+            # INFO: Add edge 1 to 2
+            if face[1] in self.e:
+                self.e[face[1]].add(face[2])
+            else:
+                self.e[face[1]] = {face[2]}
+
+        return
+
+    def is_valid_edge(self, vertex_a: (int, np.array), vertex_b: (int, np.array)) -> bool:
         # TODO(nicholas): Implement.
         # INFO: And edge is valid if va and vb are part of the same face.
         return True
 
-    def is_valid_pair(self, model: Obj, vertex_a: (int, np.array), vertex_b: (int, np.array), threshold=0.0) -> bool:
+    def is_valid_pair(self, vertex_a: (int, np.array), vertex_b: (int, np.array), threshold=0.0) -> bool:
         v_norm = np.norm(vertex_a[1] - vertex_b[1])
         return self.is_valid_edge(vertex_a, vertex_b) and (v_norm < threshold)
 
@@ -60,10 +96,7 @@ class MeshSimplifier:
 
         return Kp
 
-    def evalulate_plane_vertices_against_quadric(self, tri_v):
-        return
-
-    def simplify(self, model: Obj):
+    def simplify(self, threshold=0.0):
         # TODO: Implement.
 
         # TODO: 1. Compute Q for all faces.
