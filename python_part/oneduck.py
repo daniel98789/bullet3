@@ -57,7 +57,7 @@ def makeshape():
     while(1):
         time.sleep(1./240.)
 
-    print("visual shape is:")
+    #print("visual shape is:")
     #print(visualShapeId)
 
 

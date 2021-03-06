@@ -32,11 +32,11 @@ def trapezoid():
 
 def cow():
     shift = [0, -0.02, 0]
-    meshScaleParam = 2
+    meshScaleParam = 0.1
     meshScale = [meshScaleParam, meshScaleParam, meshScaleParam]
     
-    #cow = Obj.Obj("/data/cow.obj")
-    cow = Obj.Obj("/data/deer.obj")
+    cow = Obj.Obj("/data/cow.obj")
+    #cow = Obj.Obj("/data/deer.obj")
     vertices = cow.smaller()
     #print("COW VERTIVES : " + str(vertices))
     cowID = p.createCollisionShape(p.GEOM_MESH, vertices=vertices,
