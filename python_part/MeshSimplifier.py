@@ -2,6 +2,8 @@ import os
 import numpy as np
 import scipy.linalg as sp
 import sys
+import heapq
+
 import Obj
 
 class MeshSimplifier:
@@ -37,7 +39,7 @@ class MeshSimplifier:
                 self.e[face[1]].add(face[0])
             else:
                 self.e[face[1]] = {face[0]}
-            
+
             # INFO: Add edge 0 to 2
             if face[0] in self.e:
                 self.e[face[0]].add(face[2])
@@ -130,9 +132,21 @@ class MeshSimplifier:
 
         return Kp
 
+    def calculate_vertex_contraction(self, Q: np.array) -> np.array:
+        R1 = [Q[0][0], Q[0][1], Q[0][2], Q[0][3]]
+        R2 = [Q[0][1], Q[1][1], Q[1][2], Q[1][3]]
+        R3 = [Q[0][2], Q[1][2], Q[2][2], Q[2][3]]
+        R4 = [0, 0, 0, 1]
+        inv_M = numpy.linalg.inv(np.array([R1, R2, R3, R4]))
+        V = [0, 0, 0, 1].reshape(4, 1)
+        contracted_vertex = inv_M * V
+        return contracted_vertex
+
     def simplify(self, threshold=0.0):
         # TODO: Implement.
         # TODO: Check for correctness.
+
+        minimum_cost_pair_heap = []
 
         # INFO: 1. Compute Q for all faces.
         # INFO: face_plane_eqns: Key = Vertex, Value = Set of all plane eqns for that vertex.
@@ -160,6 +174,15 @@ class MeshSimplifier:
 
         # TODO: 2. Select all valid edges.
         valid_e = self.build_valid_edges_list(threshold)
+        for ve1, vlist in valid_e.items():
+                for ve2 in vlist:
+                    v1 = np.array(self.v[ve1])
+                    v2 = np.array(self.v[ve2])
+                    norm = np.linalg.norm(v1 - v2)
+                    heapq.heappush(minimum_cost_pair_heap, (norm, [ve1, ve2]))
+
+        print(minimum_cost_pair_heap)
+        print(heapq.heappop(minimum_cost_pair_heap))
 
         # TODO: 3. Compute optimal vertex contraction for each vertex pair
         # TODO: 4.
