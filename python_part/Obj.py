@@ -8,6 +8,7 @@ class Obj:
         self.filename = os.getcwd()+fn
         return
     
+
     def smaller(self):
         print("FILENAME IS" + self.filename)
         with open(self.filename) as fp:
@@ -20,3 +21,4 @@ class Obj:
                     #print(vs)
                 line = fp.readline()
         return self.v
+    

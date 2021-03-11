@@ -5,7 +5,6 @@ import os
 
 class PyBulletEnv:
     #camera = Camera()
-    num = 2
 
     def __init__(self):
         print("Hello")

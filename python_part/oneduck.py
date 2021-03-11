@@ -22,32 +22,34 @@ def makeClient():
 
 
 def makeshape():
-    shift = [1, 1, 1]
-    meshScale = [0.01, 0.01, 0.01]
+    shift = [0, 9, 0]
+    n = 0.1
+    meshScale = [n, n, n]
     #the visual shape and collision shape can be re-used by all createMultiBody instances (instancing)
     pClient = makeClient()
     
     # CREATE FROM FILE, visual shape different from collision shape 
-    #visualShapeId = p.createVisualShape(shapeType=p.GEOM_MESH,
-    #                                    fileName="duck.obj",
-    #                                    rgbaColor=[1, 1, 1, 1],
-    #                                    specularColor=[0.4, .4, 0],
-    #                                    visualFramePosition=shift,
-    #                                    meshScale=meshScale)
+    visualShapeId = p.createVisualShape(shapeType=p.GEOM_MESH,
+                                        fileName="data/trees9.obj",
+                                        rgbaColor=[1, 1, 1, 1],
+                                        specularColor=[0.4, .4, 0],
+                                        visualFramePosition=shift,
+                                        meshScale=meshScale)
     collisionShapeId = p.createCollisionShape(shapeType=p.GEOM_MESH,
                                           #fileName="teddy2_VHACD_CHs.obj",
                                           #fileName="duck_vhacd.obj",
-                                          #fileName="data/cow.obj",
-                                          fileName="data/deer.obj",
+                                          #fileName="data/deer_SMALLER.obj",
+                                          fileName="data/trees9_SMALLER.obj",
                                           collisionFramePosition=shift,
                                           meshScale=meshScale,
-                                          flags=p.GEOM_FORCE_CONCAVE_TRIMESH)
+                                          flags=p.GEOM_FORCE_CONCAVE_TRIMESH
+                                          )
 
 
     p.createMultiBody(baseMass = 1,
                       baseInertialFramePosition=[0, 0, 0],
                       baseCollisionShapeIndex=collisionShapeId,
-                      #baseVisualShapeIndex=visualShapeId,
+                      baseVisualShapeIndex=visualShapeId,
                       basePosition=[meshScale[0] * 2,
                                     meshScale[1] * 2, 
                                     1],

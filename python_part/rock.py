@@ -35,7 +35,7 @@ def cow():
     meshScaleParam = 0.1
     meshScale = [meshScaleParam, meshScaleParam, meshScaleParam]
     
-    cow = Obj.Obj("/data/cow.obj")
+    cow = Obj.Obj("/data/cow_SMALLER.obj")
     #cow = Obj.Obj("/data/deer.obj")
     vertices = cow.smaller()
     #print("COW VERTIVES : " + str(vertices))
