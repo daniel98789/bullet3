@@ -108,7 +108,7 @@ class MeshSimplifier:
         R3 = R + [-1]
         R4 = [0, 0, 0, 1]
         A = np.array([R1, R2, R3, R4])
-        B = np.array([0, 0, 0, 1]).reshape(4, 1)
+        B = np.transpose(np.array([0, 0, 0, 1]))
 
         # INFO: Solve Ax = B, to find a, b, c, and d.
         # INFO: Since A is sqaure we can use the trivial solve() method to find
@@ -118,10 +118,10 @@ class MeshSimplifier:
 
     def calculate_quadric_Kp(self, plane_eqn: np.array) -> np.array:
         # INFO: Points that form triangle PQR.
-        a = plane_eqn[0]
-        b = plane_eqn[1]
-        c = plane_eqn[2]
-        d = plane_eqn[3]
+        a = plane_eqn[0].item()
+        b = plane_eqn[1].item()
+        c = plane_eqn[2].item()
+        d = plane_eqn[3].item()
 
         # TODO: Rewrite this to equal (p^T)(p) where p is the plane eqn vector.
         R1 = [a*a, a*b, a*c, a*d]
@@ -132,24 +132,25 @@ class MeshSimplifier:
 
         return Kp
 
-    def calculate_vertex_contraction(self, Q: np.array) -> np.array:
-        R1 = [Q[0][0], Q[0][1], Q[0][2], Q[0][3]]
-        R2 = [Q[0][1], Q[1][1], Q[1][2], Q[1][3]]
-        R3 = [Q[0][2], Q[1][2], Q[2][2], Q[2][3]]
+    def calculate_vertex_contraction(self, Q: np.array, v1: np.array, v2: np.array) -> np.array:
+        R1 = [Q[0][0].item(), Q[0][1].item(), Q[0][2].item(), Q[0][3].item()]
+        R2 = [Q[0][1].item(), Q[1][1].item(), Q[1][2].item(), Q[1][3].item()]
+        R3 = [Q[0][2].item(), Q[1][2].item(), Q[2][2].item(), Q[2][3].item()]
         R4 = [0, 0, 0, 1]
-        inv_M = numpy.linalg.inv(np.array([R1, R2, R3, R4]))
-        V = [0, 0, 0, 1].reshape(4, 1)
-        contracted_vertex = inv_M * V
-        return contracted_vertex
+        M = np.array([R1, R2, R3, R4])
+        if np.linalg.cond(M) < (1 / sys.float_info.epsilon):
+            inv_M = np.linalg.inv(M)
+            V = np.transpose(np.array([0, 0, 0, 1]))
+            return np.dot(inv_M, V)
+        else:
+            return np.array([((v1[0].item() + v2[0].item())/2.0), ((v1[1].item() + v2[1].item())/2.0)])
 
+    # TODO: Check for correctness.
     def simplify(self, threshold=0.0):
-        # TODO: Implement.
-        # TODO: Check for correctness.
-
         minimum_cost_pair_heap = []
 
-        # INFO: 1. Compute Q for all faces.
-        # INFO: face_plane_eqns: Key = Vertex, Value = Set of all plane eqns for that vertex.
+        # INFO: 1a. Compute all plane equations.
+        # face_plane_eqns: Key = Vertex, Value = Set of all plane eqns for that vertex.
         face_plane_eqns = dict()
         for face in self.f:
             vP = self.v[face[0]]
@@ -163,29 +164,32 @@ class MeshSimplifier:
                 else:
                     face_plane_eqns[face[i]] = [plane_eqn]
 
-        # INFO: q_matrices: Key = Vertex, Value = Sum of all q matrices for that vertex.
+        # INFO: 1b. Compute Q for all vertices.
+        # q_matrices: Key = Vertex, Value = Sum of all q matrices for that vertex.
         q_matrices = dict()
         for vertex in self.e:
             Q = np.identity(4)
             for plane_eqn in face_plane_eqns[vertex]:
-                Q = Q + self.calculate_quadric_Kp(plane_eqn)
+                Q = np.add(Q, self.calculate_quadric_Kp(plane_eqn))
             q_matrices[vertex] = Q
 
 
-        # TODO: 2. Select all valid edges.
+        # INFO: 2. Select all valid edges.
         valid_e = self.build_valid_edges_list(threshold)
+
+        # INFO: 3. Compute optimal contractions for all valid edges.
+        # INFO: 4. Store those contractions in a heap sorted by cost for each optimal contraction.
         for ve1, vlist in valid_e.items():
                 for ve2 in vlist:
                     v1 = np.array(self.v[ve1])
                     v2 = np.array(self.v[ve2])
-                    norm = np.linalg.norm(v1 - v2)
-                    heapq.heappush(minimum_cost_pair_heap, (norm, [ve1, ve2]))
-
-        print(minimum_cost_pair_heap)
-        print(heapq.heappop(minimum_cost_pair_heap))
-
-        # TODO: 3. Compute optimal vertex contraction for each vertex pair
-        # TODO: 4.
-        # TODO: 5.
+                    Q = np.add(q_matrices[ve1], q_matrices[ve2])
+                    V = self.calculate_vertex_contraction(Q, v1, v2)
+                    Vt = np.transpose(V)
+                    cost = np.dot(np.dot(Vt, Q), V)
+                    heapq.heappush(minimum_cost_pair_heap, (cost, [ve1, ve2, V]))
+        
+        # TODO: 5. Remove least cost contraction and perform it. Iterate till no valid edges are left
+        # to potentially contract.
 
         return None
