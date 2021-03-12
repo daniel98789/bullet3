@@ -190,14 +190,17 @@ class MeshSimplifier:
                     v2 = np.array(self.v[ve2])
                     Q = np.add(q_matrices[ve1], q_matrices[ve2])
                     V = self.calculate_vertex_contraction(Q, v1, v2)
-                    Vt = np.transpose(V)
-                    cost = np.dot(np.dot(Vt, Q), V)
-                    heapq.heappush(min_cost_heap, (cost, [ve1, ve2, V]))
-        
+                    short_V = np.array([V[0].item(), V[1].item(), V[2].item()])
+                    cost = np.dot(np.dot(np.transpose(V), Q), V)
+                    heapq.heappush(min_cost_heap, (cost, [ve1, ve2, short_V]))
+
         # TODO: 5. Remove least cost contraction and perform it. Iterate till no valid edges are left
         # to potentially contract.
         valid_e = None
+        debug = 0
         while len(min_cost_heap) > 0:
+            print("iteration: {}".format(debug))
+
             cost_pair = heapq.heappop(min_cost_heap)
             old_V1 = cost_pair[1][0]
             old_V2 = cost_pair[1][1]
@@ -224,13 +227,21 @@ class MeshSimplifier:
 
             
             # INFO: Update self.e
+            # All edges connected to v2 are now assigned to v1 which was converted 
+            # to the contracted vertex.
+            self.e[new_V_idx] = self.e[new_V_idx].union(self.e[old_V2])
+            del self.e[old_V2]
+
             for key, value in self.e.items():
-                e_connected_v2 = self.e[old_V2]
+                if (key != new_V_idx):
+                    if old_V2 in value:
+                        value.discard(old_V2)
+                        value.add(new_V_idx)             
 
 
             # INFO: Select all valid edges
-            exit()
             valid_e = self.build_valid_edges_list(threshold)
+            debug += 1
 
 
         return None
