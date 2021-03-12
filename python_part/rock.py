@@ -56,26 +56,17 @@ def cow():
 def test_simplifier():
     # INFO: Mesh simplifier
 
-    # Triangle  P = (1, 1, 1), Q = (1, 2, 0), R = (-1, 2, 1)
-    triangle = [[1, 1, 1], [1, 2, 0], [-1, 2, 1]]
-
     # Random model
-    simple = Obj.Obj("/data/simple.obj")
+    simple = Obj.Obj("/data/teapot.obj")
     simple.smaller()
 
-    simplifier = MeshSimplifier.MeshSimplifier(simple.v, simple.group_faces['box'])
-
-    plane_eqn = simplifier.triangle_to_plane(triangle)
-    Kp = simplifier.calculate_quadric_Kp(plane_eqn)
+    simplifier = MeshSimplifier.MeshSimplifier(simple.v, simple.group_faces['default'])
     res = simplifier.simplify(1.0)
-
-    print("plane: {}".format(plane_eqn))
-    print("Kp: {}".format(Kp))
 
 if __name__ == "__main__":
     env = PyBulletEnv.PyBulletEnv()
     env.setup()
     #trapezoid()
-    cow()
+    #cow()
     test_simplifier()
     env.run()

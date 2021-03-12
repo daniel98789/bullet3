@@ -111,9 +111,14 @@ class MeshSimplifier:
         B = np.transpose(np.array([0, 0, 0, 1]))
 
         # INFO: Solve Ax = B, to find a, b, c, and d.
-        # INFO: Since A is sqaure we can use the trivial solve() method to find
-        # Ax = B.
-        sol = sp.solve(A, B)
+        # Since A is square and non-singular we can use the solve() to solve Ax = B.
+        sol = None
+        if np.linalg.cond(A) < 1/sys.float_info.epsilon:
+            sol = sp.solve(A, B)
+        else:
+            print("Can't handle singular matrix!")
+            exit()
+
         return sol
 
     def calculate_quadric_Kp(self, plane_eqn: np.array) -> np.array:
@@ -147,7 +152,7 @@ class MeshSimplifier:
 
     # TODO: Check for correctness.
     def simplify(self, threshold=0.0):
-        minimum_cost_pair_heap = []
+        min_cost_heap = []
 
         # INFO: 1a. Compute all plane equations.
         # face_plane_eqns: Key = Vertex, Value = Set of all plane eqns for that vertex.
@@ -187,9 +192,45 @@ class MeshSimplifier:
                     V = self.calculate_vertex_contraction(Q, v1, v2)
                     Vt = np.transpose(V)
                     cost = np.dot(np.dot(Vt, Q), V)
-                    heapq.heappush(minimum_cost_pair_heap, (cost, [ve1, ve2, V]))
+                    heapq.heappush(min_cost_heap, (cost, [ve1, ve2, V]))
         
         # TODO: 5. Remove least cost contraction and perform it. Iterate till no valid edges are left
         # to potentially contract.
+        valid_e = None
+        while len(min_cost_heap) > 0:
+            cost_pair = heapq.heappop(min_cost_heap)
+            old_V1 = cost_pair[1][0]
+            old_V2 = cost_pair[1][1]
+            new_V = cost_pair[1][2]
+            cost = cost_pair[0]
+
+            # INFO: Update self.v
+            self.v[old_V1] = new_V
+            del self.v[old_V2]
+            new_V_idx = old_V1
+            
+            # INFO: Update self.f
+            for i in range(0, len(self.f)):
+                f_v1, f_v2, f_v3 = self.f[i][0], self.f[i][1], self.f[i][2]
+
+                # INFO: Check for vertex index that was contracted.
+                cond = [f_v1 == old_V2, f_v2 == old_V2, f_v3 == old_V2]
+                if any(cond):
+                    for j in range(0, 3):
+                        self.f[i][j] = len(self.f) if cond[j] else self.f[i][j]
+                cond = [f_v1 > old_V2, f_v2 > old_V2, f_v3 > old_V2]
+                if any(cond):
+                    self.f[i] = [x - 1 for x in self.f[i]]
+
+            
+            # INFO: Update self.e
+            for key, value in self.e.items():
+                e_connected_v2 = self.e[old_V2]
+
+
+            # INFO: Select all valid edges
+            exit()
+            valid_e = self.build_valid_edges_list(threshold)
+
 
         return None
