@@ -32,7 +32,7 @@ class Obj:
 
                 # INFO: Vertex: Specifies a vertex by its three coordinates plus w. 
                 if (len(vs) >= 3) and (vs[0] == "v"):
-                    self.v.append([(float(vs[i])/100)+0.5 for i in range(1,4)])
+                    self.v.append([float(vs[i]) for i in range(1,4)])
 
                 # INFO: Ignore vn and vt for know. Used for texture coordinations/normals
                 # which a render engine would use but porbably not physics.

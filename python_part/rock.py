@@ -62,6 +62,7 @@ def test_simplifier():
 
     simplifier = MeshSimplifier.MeshSimplifier(simple.v, simple.group_faces['default'])
     res = simplifier.simplify(1.0)
+    print("Done!")
 
 if __name__ == "__main__":
     env = PyBulletEnv.PyBulletEnv()

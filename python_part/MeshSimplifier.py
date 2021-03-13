@@ -1,13 +1,18 @@
 import os
 import numpy as np
 import scipy.linalg as sp
+import math
 import sys
 import heapq
+import pdb
 
 import Obj
 
 class MeshSimplifier:
+    # Contains list of all vertices.
     v = []
+
+    # Contains list of all vertices belonging to a face.
     f = []
 
     # Contains list of valid edges.
@@ -90,51 +95,32 @@ class MeshSimplifier:
         v_norm = np.linalg.norm(vertex_a[1] - vertex_b[1])
         return self.is_valid_edge(vertex_a, vertex_b) and (v_norm < threshold)
 
-    def triangle_to_plane(self, tri_v) -> np.array:
-        # INFO: Points that form triangle PQR.
-        P = tri_v[0]
-        Q = tri_v[1]
-        R = tri_v[2]
+    def triangle_to_plane(self, tri_v: list) -> np.array:
+        # INFO: Create PQ and PR which spans plane.
+        # Their cross product solves plane normal.
+        P, Q, R = tri_v[0], tri_v[1], tri_v[2]
+        PQ = np.subtract(P, Q)
+        PR = np.subtract(P, R)
+        N = np.cross(PQ, PR)
 
-        # INFO: Build matices needed to solve Ax = B.
-        # A = [R1, R2, R3, R4]
-        #   R1 to R3 are constraints for a, b, c and d.
-        #   R4 is unique constraint that a^2 + b^2 + c^2 + 0d = 1
-        # B = [1, 1, 1, 0]^T
-        #   This vector is the solution coefficients to constraints above.
-        #   It is always [1, 1, 1, 0].
-        R1 = P + [-1]
-        R2 = Q + [-1]
-        R3 = R + [-1]
-        R4 = [0, 0, 0, 1]
-        A = np.array([R1, R2, R3, R4])
-        B = np.transpose(np.array([0, 0, 0, 1]))
+        # INFO: Solve for plane equation constants.
+        a = (Q[1] - P[1])*(R[2] - P[2]) - (R[1] - P[1])*(Q[2] - P[2])
+        b = (Q[2] - P[2])*(R[0] - P[0]) - (R[2] - P[2])*(Q[0] - P[0])
+        c = (Q[0] - P[0])*(R[1] - P[1]) - (R[0] - P[0])*(Q[1] - P[1])
+        d = (-1.0) * (a*P[0] + b*P[1] + c*P[2])
 
-        # INFO: Solve Ax = B, to find a, b, c, and d.
-        # Since A is square and non-singular we can use the solve() to solve Ax = B.
-        sol = None
-        if np.linalg.cond(A) < 1/sys.float_info.epsilon:
-            sol = sp.solve(A, B)
-        else:
-            print("Can't handle singular matrix!")
-            exit()
-
-        return sol
+        # INFO: Scale plane equations constants such that
+        # a^2 + b^2 + c^2 = 1.
+        k = 1.0 / math.sqrt(a*a + b*b + c*c)
+        ka = k*a
+        kb = k*b
+        kc = k*c
+        kd = k*d
+        
+        return np.array([ka, kb, kc, kd])
 
     def calculate_quadric_Kp(self, plane_eqn: np.array) -> np.array:
-        # INFO: Points that form triangle PQR.
-        a = plane_eqn[0].item()
-        b = plane_eqn[1].item()
-        c = plane_eqn[2].item()
-        d = plane_eqn[3].item()
-
-        # TODO: Rewrite this to equal (p^T)(p) where p is the plane eqn vector.
-        R1 = [a*a, a*b, a*c, a*d]
-        R2 = [a*b, b*b, b*c, b*d]
-        R3 = [a*c, b*c, c*c, c*d]
-        R4 = [a*d, b*d, c*d, d*d]
-        Kp = np.array([R1, R2, R3, R4])
-
+        Kp = np.dot(plane_eqn, np.transpose(plane_eqn))
         return Kp
 
     def calculate_vertex_contraction(self, Q: np.array, v1: np.array, v2: np.array) -> np.array:
@@ -150,26 +136,27 @@ class MeshSimplifier:
         else:
             return np.array([((v1[0].item() + v2[0].item())/2.0), ((v1[1].item() + v2[1].item())/2.0)])
 
-    # TODO: Check for correctness.
-    def simplify(self, threshold=0.0):
-        min_cost_heap = []
-
-        # INFO: 1a. Compute all plane equations.
-        # face_plane_eqns: Key = Vertex, Value = Set of all plane eqns for that vertex.
+    def calculate_all_plane_eqns(self) -> dict:
+        # INFO: face_plane_eqns: Key = Vertex, Value = Set of all plane eqns for that vertex.
         face_plane_eqns = dict()
         for face in self.f:
-            vP = self.v[face[0]]
-            vQ = self.v[face[1]]
-            vR = self.v[face[2]]
-
+            vP, vQ, vR = self.v[face[0]], self.v[face[1]], self.v[face[2]]
             plane_eqn = self.triangle_to_plane([vP, vQ, vR])
             for i in range(0, 3):
                 if face[i] in face_plane_eqns:
                     face_plane_eqns[face[i]].append(plane_eqn)
                 else:
                     face_plane_eqns[face[i]] = [plane_eqn]
+        return face_plane_eqns
 
-        # INFO: 1b. Compute Q for all vertices.
+    # TODO: Check for correctness.
+    def simplify(self, threshold=0.0):
+        min_cost_heap = []
+
+        # INFO: 1a) Compute all plane equations.
+        face_plane_eqns = self.calculate_all_plane_eqns()
+
+        # INFO: 1b) Compute Q for all vertices.
         # q_matrices: Key = Vertex, Value = Sum of all q matrices for that vertex.
         q_matrices = dict()
         for vertex in self.e:
