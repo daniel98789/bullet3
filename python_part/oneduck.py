@@ -30,7 +30,7 @@ def makeshape():
     
     # CREATE FROM FILE, visual shape different from collision shape 
     visualShapeId = p.createVisualShape(shapeType=p.GEOM_MESH,
-                                        fileName="data/trees9.obj",
+                                        fileName="data/deer_SMALLER.obj",
                                         rgbaColor=[1, 1, 1, 1],
                                         specularColor=[0.4, .4, 0],
                                         visualFramePosition=shift,
@@ -38,8 +38,8 @@ def makeshape():
     collisionShapeId = p.createCollisionShape(shapeType=p.GEOM_MESH,
                                           #fileName="teddy2_VHACD_CHs.obj",
                                           #fileName="duck_vhacd.obj",
-                                          #fileName="data/deer_SMALLER.obj",
-                                          fileName="data/trees9_SMALLER.obj",
+                                          fileName="data/deer_SMALLER.obj",
+                                          #fileName="data/trees9_SMALLER.obj",
                                           collisionFramePosition=shift,
                                           meshScale=meshScale,
                                           flags=p.GEOM_FORCE_CONCAVE_TRIMESH

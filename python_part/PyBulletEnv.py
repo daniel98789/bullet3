@@ -3,6 +3,21 @@ import time
 import pybullet as p
 import os
 
+'''
+Class PyBulletEnv:
+Contains all relevant environment information
+Author: Stacy Gaikovaia 
+
+
+Function setup:
+    Initialize the GUI, set the gravity, add information into the search path,
+    configure the visualizer
+
+Function run:
+    Run the simulation
+
+'''
+
 class PyBulletEnv:
     #camera = Camera()
 
