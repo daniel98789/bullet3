@@ -1,6 +1,6 @@
 import bpy
 
-DECIMATION_RATIO = 0.001
+DECIMATION_RATIO = 0.01
 
 '''
 Class MeshDecimator:
@@ -18,10 +18,20 @@ class MeshDecimator:
         bpy.ops.object.select_all(action="DESELECT")
         # Blender has a bunch of pre-done objects
         # stuff = ["Camera", "Cube", "Lamp"]
-        stuff = ["Cube"]
+        #stuff = ["Cube"]
+        #bpy.data.objects.remove(bpy.data.objects[0])
+        print(list(bpy.data.objects))
+        print(bpy.data.objects['Cube'])
+
+        # FOR OLDER API: 
+        '''
         for s in stuff: 
             bpy.data.objects[s].select = True
             bpy.ops.object.delete()
+        '''
+        # FOR NEW API:
+        for _, thing in enumerate(list(bpy.data.objects)):
+            bpy.data.objects.remove(bpy.data.objects[thing.name])
 
     def get_meshes(self):
         meshes = []
@@ -34,17 +44,21 @@ class MeshDecimator:
     def main(self, input_model):
         inpa, inpb = input_model.split('.')
         output_model = inpa + "_SMALLER" + '.' + inpb
-        #self.delete_crap()
+        self.delete_crap()
         bpy.ops.import_scene.obj(filepath=input_model)
 
         meshes = self.get_meshes()
 
         print("meshes: ")
         print(meshes)
+        print(list(bpy.data.objects))
         
 
         for (_, obj) in enumerate(meshes):
             #bpy.context.scene.objects.active = obj
+            #obj.select_set(True)
+            #print(bpy.context.active_object)
+            bpy.context.view_layer.objects.active = obj
             modifier = obj.modifiers.new('DecimateMod', 'DECIMATE')
             modifier.ratio = DECIMATION_RATIO
             modifier.use_collapse_triangulate = True
