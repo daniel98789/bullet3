@@ -74,6 +74,7 @@ class MeshDecimator:
         return 
 
 # main('data/trees9.obj')
+print(__name__)
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Blender Mesh Decimator")
     _, args = parser.parse_known_args()

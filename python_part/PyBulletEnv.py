@@ -37,7 +37,7 @@ class PyBulletEnv:
         p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0)
         #disable tinyrenderer, software (CPU) renderer, we don't use it here
         p.configureDebugVisualizer(p.COV_ENABLE_TINY_RENDERER, 0)
-        
+
 
     def numBodies(self):
         return p.getNumBodies()
@@ -53,3 +53,8 @@ class PyBulletEnv:
             #camInfo = p.getDebugVisualizerCamera()
             #viewMat = camData[2]
             #projMat = camData[3]
+
+
+    def analyze(self):
+        # TODO: Implement, will decide which 
+        pass
