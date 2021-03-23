@@ -56,6 +56,5 @@ def cow():
 if __name__ == "__main__":
     env = PyBulletEnv.PyBulletEnv()
     env.setup()
-    #trapezoid()
     cow()
     env.run()

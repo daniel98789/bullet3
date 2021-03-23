@@ -1,24 +1,72 @@
 import os
+import pybullet as p
 
 class Obj:
-    filename = ""
-    v = []
 
-    def __init__(self, fn):
+    def __init__(self, fn, scale):
         self.filename = os.getcwd()+fn
-        return
-    
+        self.smaller_filename = ''
+        self.v = []
+        self.meshScale = [scale, scale, scale]
+        self.obj = None
+
+        return    
+
 
     def smaller(self):
-        print("FILENAME IS" + self.filename)
-        with open(self.filename) as fp:
-            line = fp.readline()
-            while line:
-                #print(line)
-                vs = line.split()
-                if (len(vs) >=3) and (vs[0] == "v"):
-                    self.v.append([float(vs[i])/100 for i in range(1,4)])
-                    #print(vs)
-                line = fp.readline()
-        return self.v
+        # TODO: Add method that calls the mesh decimator!
+        
+        return None
     
+
+    def createObject(self, position):
+        name, suff = self.filename.split('.')
+        uniqueID = -1
+        if suff == "obj":
+            # creating an obj
+            visualShapeID = p.createVisualShape(
+                shapeType = p.GEOM_MESH,
+                filename = self.filename,
+                rgbaColor = [1, 1, 1, 1],
+                specularColor = [0.4, 0.4, 0],
+                visualFramePosition = position,
+                meshScale = self.meshScale
+            )
+            collisionShapeID = p.createCollisionShape (
+                shapeType = p.GEOM_MESH,
+                filename = self.filename,
+                collisionFramePosition = position,
+                meshScale = self.meshScale,
+                flags = p.GEOM_FORCE_CONCAVE_TRIMESH
+            )
+            uniqueID = p.createMultiBody(
+                baseMass = 1, #TODO: make a variable!
+                baseInertialFramePosition = [0, 0, 0], #TODO: make a variable
+                baseCollisionShapeIndex=collisionShapeID,
+                baseVisualShapeIndex=visualShapeID,
+                # basePosition=[meshScale[0] * 2, meshScale[1] * 2, 1],
+                useMaximalCoordinates=True,
+                useFixedBase = True
+            )
+        elif suff == "urdf":
+            uniqueID = p.loadURDF()
+        
+        return uniqueID
+
+    def move_x_y(self, x, y):
+        if self.obj == None: 
+            # TODO: Set up as an error
+            print("Object not initialized!")
+            return -1 
+        #else, obj is a unique ID!
+        pos, orient = p.getBasePositionAndOrientation(self.obj)
+        _, _, oldZ = pos
+        p.resetBasePositionAndOrientation(self.obj, [x, y, oldZ], orient)
+        
+        
+    def change_position(self,roll, pitch, yaw):
+        pos, _ = p.getBasePositionAndOrientation(self.obj)
+        orientation = p.getQuaternionFromEuler([roll, pitch, yaw])
+        p.resetBasePositionAndOrientation(self.obj, pos, orientation)
+
+
