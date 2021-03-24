@@ -2,19 +2,20 @@ import os
 import pybullet as p
 import subprocess
 import object2urdf
+import PyBulletEnv
 
 MINIMIZER = 'minimizeWithBlendr.py'
 
-class Obj:
+class Obj():
     
-    def __init__(self, fn, scale):
+    def __init__(self, fn, scale=1):
         self.filename = fn
         self.scale = scale
         self.meshScale = [scale, scale, scale]
         self.obj = None
         self.decims = {}
 
-        return    
+        return 
 
 
     def smaller(self, ratio):
@@ -45,54 +46,57 @@ class Obj:
 #        p.loadURDF("data/cow/data.urdf", globalScaling=self.scale, useFixedBase=True, basePosition = [0, 1, 2.7], baseOrientation=[1,1,1,1])
         return filename + ".urdf"
 
-    def createObjectObj(self, position, ratio):
+    def createObjectObj(self, position, ratio = 1.0):
         '''
         Function createObjectObj
 
         Creates an instance of the relevant obj file and adds it to the object instances dictionairy 
         '''
-        _, suff = self.filename.split('.')
-        if suff == "obj":
+        if ratio in self.decims:
+            file_to_load = self.decims[ratio]
+        else: 
+            file_to_load = self.smaller(ratio)
+        #_, suff = self.filename.split('.')
+        #if suff == "obj":
             # creating an obj
-            visualShapeID = p.createVisualShape(
-                shapeType = p.GEOM_MESH,
-                fileName = self.filename,
-                rgbaColor = [3, 1, 1, 1],
-                specularColor = [0.4, 0.4, 0.4],
-                visualFramePosition = position,
-                meshScale = self.meshScale
-            )
-            collisionShapeID = p.createCollisionShape (
-                shapeType = p.GEOM_MESH,
-                fileName = self.filename,
-                #collisionFramePosition = position,
-                meshScale = self.meshScale,
-                #flags = p.GEOM_FORCE_CONCAVE_TRIMESH
-            )
+        visualShapeID = p.createVisualShape(
+            shapeType = p.GEOM_MESH,
+            fileName = file_to_load,
+            rgbaColor = [0.7, 0, 0.7, 1], #[3, 1, 1, 1],
+            specularColor = [0.4, 0.4, 0.4],
+            visualFramePosition = position,
+            meshScale = self.meshScale
+        )
+        collisionShapeID = p.createCollisionShape (
+            shapeType = p.GEOM_MESH,
+            fileName = file_to_load,
+            #collisionFramePosition = position,
+            meshScale = self.meshScale,
+            #flags = p.GEOM_FORCE_CONCAVE_TRIMESH
+        )
 
-            #orn = p.getQuaternionFromEuler([0, 0, 0])
-            p.createMultiBody(
-                baseMass = 1, #TODO: make a variable!
-                baseInertialFramePosition = [0, 0, 0], #TODO: make a variable
-                baseCollisionShapeIndex=collisionShapeID,
-                baseVisualShapeIndex=visualShapeID,
-                basePosition = position,
-                # useMaximalCoordinates=True,
-            #    baseOrientation = orn
-                #useFixedBase = True
-            )
+        #orn = p.getQuaternionFromEuler([0, 0, 0])
+        return p.createMultiBody(
+            baseMass = 1, #TODO: make a variable!
+            baseInertialFramePosition = [0, 0, 0], #TODO: make a variable
+            baseCollisionShapeIndex=collisionShapeID,
+            baseVisualShapeIndex=visualShapeID,
+            basePosition = position,
+            # useMaximalCoordinates=True,
+        #    baseOrientation = orn
+            #useFixedBase = True
+        )
 
     def printDecims(self):
         print(self.decims)
 
-    def createObjectURDF(self, position, ratio):
+    def createObjectURDF(self, position, ratio = 1.0):
         # First, check if there's a dictionary value at that key!
         if ratio in self.decims:
             file_to_load = self.decims[ratio]
         else: 
             file_to_load = self.smaller(ratio)
-        p.loadURDF(self.toURDF(file_to_load, ratio), globalScaling=self.scale, useFixedBase=True, basePosition = position, baseOrientation=[1,1,1,1])  
-        return
+        return p.loadURDF(self.toURDF(file_to_load, ratio), globalScaling=self.scale, useFixedBase=True, basePosition = position, baseOrientation=[1,1,1,1])  
 
     def move_x_y(self, x, y):
         if self.obj == None: 

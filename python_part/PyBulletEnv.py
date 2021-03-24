@@ -2,10 +2,13 @@ import pybullet_data
 import time
 import pybullet as p
 import os
+import numpy as np
 
 '''
 Class PyBulletEnv:
-Contains all relevant environment information
+Wrapper that contains all relevant environment information, including information about the number of
+obj classes that have so far been instantiated.
+
 Author: Stacy Gaikovaia 
 
 
@@ -55,6 +58,26 @@ class PyBulletEnv:
             #projMat = camData[3]
 
 
-    def analyze(self):
-        # TODO: Implement, will decide which 
-        pass
+    def analyze(self, obj, IDArray):
+        cameraPos = np.array((0, 0, 0))
+        distances = []
+        positions = []
+
+
+        # Get the max distance and generate a position array
+        for (pos, _) in [p.getBasePositionAndOrientation(val) for val in IDArray]:
+            #print(pos, orr)
+            x, y, z = pos
+            positions.append(pos)
+            distances.append(np.linalg.norm(cameraPos - np.array((x, y, z))))
+
+        norm = [float(i)/max(distances) for i in distances]
+        
+        #print(norm)
+        # Replace all the old objects with new ones!
+        for i, val in enumerate(IDArray):
+            decRatio = max(round(1.0 - norm[i], 2), 0.1) # Don't want to decimate to any less than 10% of the origial faces
+            #print(decRatio)
+            p.removeBody(val)
+            obj.createObjectURDF(positions[i], decRatio)
+        return
