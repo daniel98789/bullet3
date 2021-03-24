@@ -1,18 +1,18 @@
-<robot name="data">
+<robot name="cow_0.01.obj">
 	<link name="_name">
 		<visual>
-			<origin rpy="0.0 0.0 0.0" xyz="-103.71005223753788 -562.7994779884127 219.541779" />
+			<origin rpy="0.0 0.0 0.0" xyz="-445.2511355614668 -688.4929868259242 119.031204" />
 			<geometry>
-				<mesh filename="data/cow/cow.obj" scale="1 1 1" />
+				<mesh filename="cow_0.01.obj" scale="1 1 1" />
 			</geometry>
 			<material name="texture">
 				<color rgba="1.0 1.0 1.0 1.0" />
 			</material>
 		</visual>
 		<collision>
-			<origin rpy="0.0 0.0 0.0" xyz="-103.71005223753788 -562.7994779884127 219.541779" />
+			<origin rpy="0.0 0.0 0.0" xyz="-445.2511355614668 -688.4929868259242 119.031204" />
 			<geometry>
-				<mesh filename="data/cow/cow.obj" scale="1 1 1" />
+				<mesh filename="cow_0.01.obj" scale="1 1 1" />
 			</geometry>
 		</collision>
 		<inertial>

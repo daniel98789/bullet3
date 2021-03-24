@@ -66,7 +66,7 @@ class MeshDecimator:
             bpy.ops.object.modifier_apply(modifier = 'DecimateMod')
             # Old API : 
             # bpy.ops.object.modifier_apply(apply_as='DATA', modifier = 'DecimateMod')
-            # TODO: Save these values by returning them!!
+            # Print is necessairy because this is how we return to the main function 
             print("{} has {} verts, {} edges, {} polys after decimation".format(obj.name, len(obj.data.vertices), len(obj.data.edges), len(obj.data.polygons)))
 
         bpy.ops.export_scene.obj(filepath=output_model)
