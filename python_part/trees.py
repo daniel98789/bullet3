@@ -6,6 +6,7 @@ if __name__ == "__main__":
     env = PyBulletEnv.PyBulletEnv()
     env.setup()
     tree = Obj.Obj("data/tree/Tree.obj")
+    
 
     forest = []
     for _ in range(2):
@@ -14,6 +15,7 @@ if __name__ == "__main__":
         forest.append(tree.createObjectObj([x, y , 3.7], 1.0))
 
     env.analyze(tree, forest)
+    
     env.run()
 
 
