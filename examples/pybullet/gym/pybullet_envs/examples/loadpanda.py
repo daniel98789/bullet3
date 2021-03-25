@@ -24,14 +24,20 @@ while (1):
 	p.stepSimulation()
 	#time.sleep(timeStep)
 	frameCounter += 1
-	print(frameCounter)
-	p.addUserDebugText(str(frameCounter), [10, 0, 0.1],
+	#print(frameCounter)
+	numBodies = p.getNumBodies()
+	print(numBodies)
+	"""p.addUserDebugText(str(frameCounter), [10, 0, 0.1],
 				textColorRGB=[1, 0, 0],
 				textSize=1.5,
-				lifeTime=0.1)
+				lifeTime=0.5)
 
 	p.addUserDebugText(str(1.0/(time.time() - start_time)), [10, 0, 1],
 				textColorRGB=[1, 0, 0],
 				textSize=1.5,
-				lifeTime=0.1)
-
+				lifeTime=0.5)
+"""
+	p.addUserDebugText(str(numBodies), [10, 0, 1],
+				textColorRGB=[1, 0, 0],
+				textSize=1.5,
+ 				lifeTime=0.5)
