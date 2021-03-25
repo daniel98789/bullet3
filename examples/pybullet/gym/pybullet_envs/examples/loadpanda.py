@@ -14,8 +14,17 @@ p.setTimeStep(timeStep)
 p.setGravity(0,-9.8,0)
  
 panda = panda_sim.PandaSim(p,[0,0,0])
+
+frameCounter = 0
+
 while (1):
 	panda.step()
 	p.stepSimulation()
-	time.sleep(timeStep)
-	
+	#time.sleep(timeStep)
+	frameCounter += 1
+	print(frameCounter)
+	p.addUserDebugText(str(frameCounter), [10, 0, 0.1],
+				textColorRGB=[1, 0, 0],
+				textSize=1.5,
+				lifeTime=0.1)
+
