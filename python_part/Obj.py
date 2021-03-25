@@ -29,6 +29,8 @@ class Obj():
 
         name, suff = self.filename.split(".")
         output_file = name+ "_" + str(ratio) + '.' + suff
+        if os.path.exists(output_file):
+            return output_file
 
         ps = subprocess.Popen(["blender", "-b", "-P", MINIMIZER, "--", str(ratio), self.filename], stdout = subprocess.PIPE)
         output = subprocess.check_output(["grep", "after decimation"], stdin = ps.stdout)
@@ -62,14 +64,14 @@ class Obj():
         visualShapeID = p.createVisualShape(
             shapeType = p.GEOM_MESH,
             fileName = file_to_load,
-            rgbaColor = [0.7, 0, 0.7, 1], #[3, 1, 1, 1],
-            specularColor = [0.4, 0.4, 0.4],
+            rgbaColor = [1.0, 0.5, 0.0, 1.0], #[0.7, 0, 0.7, 1], #[3, 1, 1, 1],
+            #specularColor = [0.4, 0.4, 0.4],
             visualFramePosition = position,
             meshScale = self.meshScale
         )
         collisionShapeID = p.createCollisionShape (
             shapeType = p.GEOM_MESH,
-            fileName = file_to_load,
+            fileName = self.filename, #file_to_load,
             #collisionFramePosition = position,
             meshScale = self.meshScale,
             #flags = p.GEOM_FORCE_CONCAVE_TRIMESH
@@ -90,13 +92,13 @@ class Obj():
     def printDecims(self):
         print(self.decims)
 
-    def createObjectURDF(self, position, ratio = 1.0):
+    def createObjectURDF(self, position, ratio = 1.0, orient = [1, 1, 1, 1]):
         # First, check if there's a dictionary value at that key!
         if ratio in self.decims:
             file_to_load = self.decims[ratio]
         else: 
             file_to_load = self.smaller(ratio)
-        return p.loadURDF(self.toURDF(file_to_load, ratio), globalScaling=self.scale, useFixedBase=True, basePosition = position, baseOrientation=[1,1,1,1])  
+        return p.loadURDF(self.toURDF(file_to_load, ratio), globalScaling=self.scale, useFixedBase=True, basePosition = position, baseOrientation=orient)  
 
     def move_x_y(self, x, y):
         if self.obj == None: 
