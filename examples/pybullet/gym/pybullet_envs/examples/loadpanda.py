@@ -30,7 +30,7 @@ while (1):
 
 	panda.step()
 	p.stepSimulation()
-	prof.profile(1)
+	prof.profile(31)
 	time.sleep(timeStep)
 
 	
