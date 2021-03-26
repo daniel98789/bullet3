@@ -73,3 +73,38 @@ class Profiler:
 							textSize=1.3,
 							lifeTime=self.update_interval+0.1)
 
+			if (profile_mask & (1<<6)):
+				cameraPosition = self.p.getDebugVisualizerCamera()
+				viewHeight = cameraPosition[0]
+				viewWidth = cameraPosition[1]
+				yaw = cameraPosition[8]
+				pitch = cameraPosition[9]
+				dist = cameraPosition[10]
+				targetX = cameraPosition[11][0]
+				targetY = cameraPosition[11][1]
+				targetZ = cameraPosition[11][2]
+
+				self.p.addUserDebugText("View Size: " + str(viewHeight) + "x" + str(viewWidth), 
+								[10, -1, -1.07],
+								textColorRGB=[0, 0, 0],
+								textSize=1.3,
+								lifeTime=self.update_interval+0.1)
+				
+				self.p.addUserDebugText("Yaw: " + str(yaw) + " Pitch: " + str(pitch), 
+								[10, -1.5, -1.07],
+								textColorRGB=[0, 0, 0],
+								textSize=1.3,
+								lifeTime=self.update_interval+0.1)
+
+				self.p.addUserDebugText("Camera Distance: " + "{:.2f}".format(dist), 
+								[10, -2, -1.07],
+								textColorRGB=[0, 0, 0],
+								textSize=1.3,
+								lifeTime=self.update_interval+0.1)
+
+				self.p.addUserDebugText("Camera Position: x=" + str(targetX) + " y=" + str(targetY) + " z=" + str(targetZ), 
+								[10, -2.5, -1.07],
+								textColorRGB=[0, 0, 0],
+								textSize=1.3,
+								lifeTime=self.update_interval+0.1)
+
