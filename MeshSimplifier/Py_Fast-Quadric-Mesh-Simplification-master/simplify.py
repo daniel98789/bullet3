@@ -40,6 +40,7 @@ else:
 sh.copy(ASSETS_DIR+'base_assets/'+obj_file_name,OBJ_DIR+'simple_'+ obj_name +str(0)+'.obj')
 
 for i in range(1,7):
+	simplify = pySimplify()
 	simplify.setMesh(mesh)
 	simplify.simplify_mesh(target_count = 1000, aggressiveness=i, preserve_border=True, verbose=10)
 	reduced_mesh = simplify.getMesh()
