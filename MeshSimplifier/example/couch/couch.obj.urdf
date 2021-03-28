@@ -1,4 +1,4 @@
-<robot name="human.obj">
+<robot name="couch.obj">
 	<link name="_name">
 		<visual>
 			<origin xyz="0 0 0" rpy="0 0 0" />
