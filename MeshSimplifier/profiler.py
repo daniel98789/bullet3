@@ -6,7 +6,7 @@ class Profiler:
 	def __init__(self,bullet_client,bodyUniqueIDList):
 		self.prev_count = 0
 		self.frameCounter = 0
-		self.update_interval = 1.44
+		self.update_interval = 0.5
 		self.p=bullet_client
 		self.bodies = bodyUniqueIDList
 		self.start_time = time.time()
@@ -36,7 +36,7 @@ class Profiler:
 					numJoints += self.p.getNumJoints(ID)
 
 				self.p.addUserDebugText("Joint Count: " + str(numJoints), 
-							[10, -0.5, -1.55],
+							[10, -0.5, -1.5],
 							textColorRGB=[0, 0, 0],
 							textSize=1.3,
 							lifeTime=self.update_interval+0.1)
@@ -85,25 +85,25 @@ class Profiler:
 				targetZ = cameraPosition[11][2]
 
 				self.p.addUserDebugText("View Size: " + str(viewHeight) + "x" + str(viewWidth), 
-								[10, -1, -1.77],
+								[10, -1, -1.07],
 								textColorRGB=[0, 0, 0],
 								textSize=1.3,
 								lifeTime=self.update_interval+0.1)
 				
 				self.p.addUserDebugText("Yaw: " + str(yaw) + " Pitch: " + str(pitch), 
-								[10, -1.5, -1.99],
+								[10, -1.5, -1.07],
 								textColorRGB=[0, 0, 0],
 								textSize=1.3,
 								lifeTime=self.update_interval+0.1)
 
 				self.p.addUserDebugText("Camera Distance: " + "{:.2f}".format(dist), 
-								[10, -2, -2.22],
+								[10, -2, -1.07],
 								textColorRGB=[0, 0, 0],
 								textSize=1.3,
 								lifeTime=self.update_interval+0.1)
 
 				self.p.addUserDebugText("Camera Position: x=" + str(targetX) + " y=" + str(targetY) + " z=" + str(targetZ), 
-								[10, -2.5, -2.45],
+								[10, -2.5, -1.07],
 								textColorRGB=[0, 0, 0],
 								textSize=1.3,
 								lifeTime=self.update_interval+0.1)

@@ -19,21 +19,13 @@ panda = panda_sim.PandaSim(p,[0,0,0])
 prof = profiler.Profiler(p,[panda.panda])
 prof.select_object_to_get_pos_ori(panda.panda)
 
-start_time = time.time()
-
-prev_count = 0 
-
 p.resetDebugVisualizerCamera( cameraDistance=1.4, cameraYaw=40, cameraPitch=-30, cameraTargetPosition=[0,0,0])
 
 while (1):
-	curr_time = time.time()
-
 	panda.step()
 	p.stepSimulation()
+	
 	prof.profile(127)
 	time.sleep(timeStep)
-
-	
-	#velocity = p.getBaseVelocity(panda.ball1)
 
 	
