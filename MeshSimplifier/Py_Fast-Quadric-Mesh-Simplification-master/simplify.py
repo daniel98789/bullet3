@@ -26,9 +26,6 @@ sys.stdout = open(os.devnull, 'w')
 kwargs = tr.exchange.obj.load_obj(obj_file)
 mesh = tr.exchange.load.load_kwargs(kwargs)
 
-
-simplify = pySimplify()
-
 if (os.path.exists(OBJ_DIR)):
 	sh.rmtree(OBJ_DIR)
 	os.mkdir(OBJ_DIR)
