@@ -2,12 +2,13 @@ import pybullet as p
 import time
 import pybullet_data
 import profiler
+import pathlib
 
 physicsClient = p.connect(p.GUI)
-p.setAdditionalSearchPath("/home/daniel/bullet3/MeshSimplifier/example/pig")
+p.setAdditionalSearchPath(str(pathlib.Path(__file__).parent.absolute()) + "/pig")
 
 p.setGravity(0,0,-9.8)
-planeId = p.loadURDF("plane.urdf")
+#planeId = p.loadURDF("plane.urdf")
 pigId = p.loadURDF("pig.obj.urdf", [0, 0, 0.4])
 dt = 1./240.
 p.setTimeStep(dt)
