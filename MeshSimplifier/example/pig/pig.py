@@ -7,7 +7,7 @@ import debugvisualizer
 physicsClient = p.connect(p.GUI)
 p.setAdditionalSearchPath(str(pathlib.Path(__file__).parent.absolute()) + "/simple_pig")
 
-p.setGravity(0,0,-9.8)
+p.setGravity(0,0,0)
 planeId = p.loadURDF("plane.urdf")
 
 dt = 1./60.
@@ -28,7 +28,8 @@ while (1):
     if abs(cameraDistance-lastCameraDistance) >= 1:
         
         pigNum = cameraDistance-4
-        if pigNum > 6:
+        print(pigNum)
+        if pigNum >= 7:
             pigNum = 6
         elif pigNum < 0:
             pigNum = 0
@@ -45,11 +46,9 @@ while (1):
     if curr_time - start_time > 2:
         found, loc = debugvisualizer.object_is_in_frame(
             p, pig, prev_loc)
-        if found != prev_state:
-            
+        if found != prev_state:            
             if found:
-                
-                pigNum = cameraDistance-4-2
+                pigNum = pigNum - 2
                 if pigNum > 6:
                     pigNum = 6
                 elif pigNum < 0:
@@ -64,7 +63,7 @@ while (1):
                 lastCameraDistance = cameraDistance
                 
             else:
-                pigNum = cameraDistance-4+2
+                pigNum = pigNum + 2
                 if pigNum > 6:
                     pigNum = 6
                 elif pigNum < 0:
